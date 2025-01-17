@@ -2,6 +2,7 @@ package dstree
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -43,14 +44,8 @@ type node[T any] struct {
 func (n *node[T]) Add(hostname string, payload T) TreeNode[T] {
 	n.locker.Lock()
 	defer n.locker.Unlock()
-
-	hostname = strings.TrimSpace(strings.TrimSuffix(hostname, "."))
-	if hostname == "" {
-		return n
-	}
-
 	this := n
-	for _, part := range reverse(strings.FieldsFunc(hostname, isDot)) {
+	for _, part := range slices.Backward(strings.FieldsFunc(hostname, isDot)) {
 		if child, ok := this.children[part]; ok {
 			this = child
 			continue
@@ -67,7 +62,7 @@ func (n *node[T]) Find(hostname string) TreeNode[T] {
 	defer n.locker.RUnlock()
 
 	this := n
-	for _, part := range reverse(strings.Split(hostname, ".")) {
+	for _, part := range slices.Backward(strings.FieldsFunc(hostname, isDot)) {
 		if child := this.findChild(part); child != nil {
 			this = child
 			continue
@@ -78,15 +73,12 @@ func (n *node[T]) Find(hostname string) TreeNode[T] {
 }
 
 func (n *node[T]) Remove(hostname string) {
-	if hostname = strings.TrimSpace(hostname); hostname == "" {
-		return
-	}
 
 	n.locker.Lock()
 	defer n.locker.Unlock()
 
 	this := n
-	for _, part := range reverse(strings.Split(hostname, ".")) {
+	for _, part := range slices.Backward(strings.FieldsFunc(hostname, isDot)) {
 		child, ok := this.children[part]
 		if !ok {
 			return
@@ -204,11 +196,4 @@ func (n *node[T]) sortedChildren() []*node[T] {
 // 工具函数
 func isDot(r rune) bool {
 	return r == '.'
-}
-
-func reverse(ss []string) []string {
-	for i, j := 0, len(ss)-1; i < j; i, j = i+1, j-1 {
-		ss[i], ss[j] = ss[j], ss[i]
-	}
-	return ss
 }

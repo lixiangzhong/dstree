@@ -1,6 +1,8 @@
 package dstree
 
-import "testing"
+import (
+	"testing"
+)
 
 // TestFind
 func TestFind(t *testing.T) {
@@ -71,7 +73,7 @@ func BenchmarkFindWithLocker(b *testing.B) {
 	tree.Add("www.123.com", "www123")
 	tree.Add("*.api.123.com", "*api123")
 	b.ResetTimer()
-	b.SetParallelism(8)
+	b.SetParallelism(32)
 	b.RunParallel(func(p *testing.PB) {
 		for p.Next() {
 			tree.Find("next.api.123.com")
