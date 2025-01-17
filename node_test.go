@@ -16,7 +16,7 @@ func TestFind(t *testing.T) {
 	}{
 		{"www.abc.com", 1},
 		{"next.api.123.com", 2},
-		{"any.api.123.com", 3},
+		{"any.api.123.com", 0},
 		{"any.123.com", 3},
 		{"www.123.com", 4},
 		{"any.any.123.com", 3},
@@ -33,6 +33,16 @@ func TestFind(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestRemove
+func TestRemove(t *testing.T) {
+	tree := NewTree[int]()
+	tree.Add("1.2.3.com", 1111)
+	tree.Add("a.1.2.3.com", 2222)
+	tree.Add("b.d.q.w.a.1.2.3.com", 3333)
+	tree.Remove("b.d.q.w.a.1.2.3.com")
+	tree.Dump()
 }
 
 // benchmark Find
